@@ -25,11 +25,13 @@ body{
 
 h1{
     margin-bottom:10px;
+    font-size:48px;
 }
 
-p{
+.description{
     color:#666;
     margin-bottom:20px;
+    font-size:18px;
 }
 
 textarea{
@@ -40,10 +42,17 @@ textarea{
     border:1px solid #ccc;
     border-radius:8px;
     resize:vertical;
+    box-sizing:border-box;
+}
+
+.stats{
+    margin-top:10px;
+    color:#666;
+    font-size:14px;
 }
 
 .buttons{
-    margin-top:15px;
+    margin-top:20px;
 }
 
 button{
@@ -55,6 +64,7 @@ button{
     cursor:pointer;
     font-size:16px;
     margin-right:10px;
+    transition:0.2s;
 }
 
 button:hover{
@@ -68,14 +78,38 @@ button:hover{
     border-radius:8px;
     min-height:120px;
     white-space:pre-wrap;
-    line-height:1.6;
+    line-height:1.7;
+    font-size:16px;
+}
+
+.limit{
+    margin-top:15px;
+    color:#888;
+    font-size:14px;
 }
 
 footer{
-    margin-top:30px;
+    margin-top:40px;
     text-align:center;
     color:gray;
     font-size:14px;
+}
+
+@media(max-width:768px){
+
+    body{
+        padding:15px;
+    }
+
+    h1{
+        font-size:34px;
+    }
+
+    button{
+        width:100%;
+        margin-bottom:10px;
+    }
+
 }
 
 </style>
@@ -87,15 +121,26 @@ footer{
 
 <h1>Free AI Paraphrasing Tool</h1>
 
-<p>
-Rewrite essays, emails, articles, and content instantly with AI.
+<p class="description">
+Rewrite essays, emails, articles, blogs, and content instantly using AI.
 </p>
 
-<textarea id="input" placeholder="Enter your text here..."></textarea>
+<textarea
+id="input"
+placeholder="Enter your text here..."
+></textarea>
+
+<div class="stats">
+    <span id="count">0 characters</span>
+</div>
 
 <div class="buttons">
     <button onclick="rewriteText()">Rewrite</button>
     <button onclick="copyResult()">Copy</button>
+</div>
+
+<div class="limit">
+Free daily rewrites available.
 </div>
 
 <div id="result"></div>
@@ -108,25 +153,46 @@ Free AI Rewrite Tool • Instant Results
 
 <script>
 
+let usage = localStorage.getItem("usage") || 0;
+
+document.getElementById("input").addEventListener("input", function(){
+
+    document.getElementById("count").innerText =
+    this.value.length + " characters";
+
+});
+
 async function rewriteText(){
 
     const text = document.getElementById("input").value;
 
     if(!text){
+
         alert("Please enter some text.");
+
         return;
     }
 
-    document.getElementById("result").innerText = "Rewriting...";
+    if(usage >= 5){
+
+        alert("Daily free limit reached.");
+
+        return;
+    }
+
+    document.getElementById("result").innerText =
+    "Rewriting...";
 
     try{
 
-        const response = await fetch("https://api.deepseek.com/chat/completions",{
+        const response = await fetch(
+        "https://api.deepseek.com/chat/completions",{
 
             method:"POST",
 
             headers:{
                 "Content-Type":"application/json",
+
                 "Authorization":"Bearer sk-535cf7e638374321be2e1daefaa3746b"
             },
 
@@ -139,8 +205,21 @@ async function rewriteText(){
                         role:"user",
 
                         content:
-                        "You are a professional AI rewriting assistant. Rewrite the following text naturally, fluently, and clearly while preserving the original meaning and language. Do not explain anything. Only return the rewritten version:\n\n"
-                        + text
+`You are a professional AI rewriting assistant.
+
+Rewrite the following text naturally, fluently, and clearly while preserving the original meaning and language.
+
+Rules:
+- Keep the same language
+- Improve readability
+- Improve fluency
+- Do not explain anything
+- Do not add extra comments
+- Only return the rewritten version
+
+Text:
+
+${text}`
                     }
                 ]
 
@@ -150,8 +229,16 @@ async function rewriteText(){
 
         const data = await response.json();
 
+        const result =
+        data.choices?.[0]?.message?.content ||
+        "API Error";
+
         document.getElementById("result").innerText =
-        data.choices?.[0]?.message?.content || "API Error";
+        result;
+
+        usage++;
+
+        localStorage.setItem("usage", usage);
 
     }catch(error){
 
@@ -164,7 +251,15 @@ async function rewriteText(){
 
 function copyResult(){
 
-    const text = document.getElementById("result").innerText;
+    const text =
+    document.getElementById("result").innerText;
+
+    if(!text){
+
+        alert("Nothing to copy.");
+
+        return;
+    }
 
     navigator.clipboard.writeText(text);
 
