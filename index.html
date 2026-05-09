@@ -2,149 +2,314 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>AI Rewriter Pro</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 
-body{
-font-family:Arial;
-background:#f5f5f5;
-padding:40px;
+*{
 margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+font-family:'Inter',sans-serif;
+background:
+radial-gradient(circle at top left,#1e293b,#0f172a 60%);
+color:white;
+min-height:100vh;
+padding:40px 20px;
+overflow-x:hidden;
 }
 
 .container{
-max-width:900px;
+max-width:950px;
 margin:auto;
-background:white;
-padding:30px;
-border-radius:20px;
-box-shadow:0 0 20px rgba(0,0,0,0.08);
+backdrop-filter:blur(20px);
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.08);
+border-radius:28px;
+padding:40px;
+box-shadow:
+0 10px 40px rgba(0,0,0,0.35);
 }
 
-h1{
-font-size:55px;
-margin-bottom:10px;
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:30px;
 }
 
-p{
-color:#666;
+.logo{
+font-size:42px;
+font-weight:800;
+background:linear-gradient(to right,#60a5fa,#c084fc);
+-webkit-background-clip:text;
+-webkit-text-fill-color:transparent;
+}
+
+.subtitle{
+margin-top:10px;
+color:#94a3b8;
+line-height:1.6;
+font-size:16px;
 }
 
 textarea{
 width:100%;
-height:220px;
-padding:20px;
-font-size:20px;
-border-radius:10px;
-border:1px solid #ccc;
-resize:none;
-box-sizing:border-box;
-margin-top:20px;
-}
-
-button{
-padding:14px 25px;
-border:none;
-border-radius:10px;
-font-size:18px;
-cursor:pointer;
-margin-top:20px;
-margin-right:10px;
-background:#2563eb;
+height:240px;
+background:rgba(255,255,255,0.06);
+border:1px solid rgba(255,255,255,0.1);
 color:white;
+padding:22px;
+border-radius:20px;
+font-size:18px;
+resize:none;
+outline:none;
+margin-top:25px;
+transition:0.3s;
 }
 
-button:hover{
-opacity:0.9;
+textarea:focus{
+border-color:#60a5fa;
+box-shadow:0 0 20px rgba(96,165,250,0.3);
+}
+
+.controls{
+display:flex;
+flex-wrap:wrap;
+gap:15px;
+margin-top:20px;
+align-items:center;
 }
 
 select{
-padding:12px;
+background:#111827;
+color:white;
+padding:12px 18px;
+border-radius:12px;
+border:none;
+font-size:15px;
+}
+
+button{
+padding:14px 22px;
+border:none;
+border-radius:14px;
 font-size:16px;
-border-radius:8px;
+font-weight:600;
+cursor:pointer;
+transition:0.25s;
+}
+
+.primary{
+background:linear-gradient(to right,#2563eb,#7c3aed);
+color:white;
+}
+
+.primary:hover{
+transform:translateY(-2px);
+box-shadow:0 8px 20px rgba(99,102,241,0.4);
+}
+
+.secondary{
+background:#1e293b;
+color:white;
+}
+
+.secondary:hover{
+background:#334155;
+}
+
+.stats{
 margin-top:15px;
+color:#94a3b8;
+font-size:14px;
 }
 
-#result{
-margin-top:30px;
-background:#f1f1f1;
-padding:25px;
-border-radius:10px;
-min-height:200px;
+.result{
+margin-top:35px;
+padding:28px;
+border-radius:22px;
+background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.08);
+min-height:220px;
 white-space:pre-wrap;
-line-height:1.8;
-font-size:18px;
+line-height:1.9;
+font-size:17px;
+overflow:auto;
 }
 
-.dark{
-background:#111;
-color:white;
+.loading{
+display:flex;
+align-items:center;
+gap:10px;
 }
 
-.dark .container{
-background:#1e1e1e;
+.dot{
+width:10px;
+height:10px;
+background:#60a5fa;
+border-radius:50%;
+animation:bounce 1.2s infinite;
 }
 
-.dark textarea{
-background:#222;
-color:white;
-border:1px solid #555;
+.dot:nth-child(2){
+animation-delay:0.2s;
 }
 
-.dark #result{
-background:#222;
+.dot:nth-child(3){
+animation-delay:0.4s;
+}
+
+@keyframes bounce{
+0%,80%,100%{
+transform:scale(0);
+opacity:0.5;
+}
+40%{
+transform:scale(1);
+opacity:1;
+}
 }
 
 .footer{
-margin-top:20px;
+margin-top:25px;
 text-align:center;
-color:#888;
+color:#64748b;
 font-size:14px;
+}
+
+.darkToggle{
+background:#0f172a;
+border:1px solid rgba(255,255,255,0.1);
+}
+
+@media(max-width:768px){
+
+.logo{
+font-size:32px;
+}
+
+textarea{
+height:200px;
+}
+
+.controls{
+flex-direction:column;
+align-items:stretch;
+}
+
+button,
+select{
+width:100%;
+}
+
 }
 
 </style>
 </head>
 
-<body id="body">
+<body>
 
 <div class="container">
 
-<h1>AI Rewriter Pro</h1>
+<div class="topbar">
 
-<p>
-Academic • SEO • Humanizer • AI Detector Bypass • Translation
-</p>
+<div>
+
+<div class="logo">
+AI Rewriter Pro
+</div>
+
+<div class="subtitle">
+Humanizer • SEO • Academic • AI Detector Bypass • Translation
+</div>
+
+</div>
+
+<button
+class="secondary darkToggle"
+onclick="toggleDark()">
+Dark Mode
+</button>
+
+</div>
 
 <select id="mode">
-<option value="humanizer">Humanizer Mode</option>
-<option value="academic">Academic Mode</option>
-<option value="seo">SEO Mode</option>
-<option value="bypass">AI Detector Bypass</option>
-<option value="translate">Translate</option>
-<option value="social">Social Media Post</option>
-<option value="title">Generate Titles</option>
+
+<option value="humanizer">
+Humanizer Mode
+</option>
+
+<option value="academic">
+Academic Mode
+</option>
+
+<option value="seo">
+SEO Mode
+</option>
+
+<option value="bypass">
+AI Detector Bypass
+</option>
+
+<option value="translate">
+Translate
+</option>
+
+<option value="social">
+Social Media Post
+</option>
+
+<option value="title">
+Generate Titles
+</option>
+
 </select>
 
 <textarea
 id="input"
-placeholder="Paste your text here..."
+placeholder="Paste your content here..."
 oninput="updateCount()"
 ></textarea>
 
-<div id="count">0 characters</div>
+<div class="stats" id="count">
+0 characters
+</div>
 
-<button onclick="rewriteText()">Rewrite</button>
+<div class="controls">
 
-<button onclick="copyResult()">Copy</button>
+<button
+class="primary"
+onclick="rewriteText()">
+Rewrite
+</button>
 
-<button onclick="toggleDark()">Dark Mode</button>
+<button
+class="secondary"
+onclick="copyResult()">
+Copy
+</button>
 
-<div id="result"></div>
+</div>
+
+<div class="result" id="result">
+
+AI output will appear here...
+
+</div>
 
 <div class="footer">
-Powered by DeepSeek AI
+
+Powered by DeepSeek AI • AI Rewriter Pro
+
 </div>
 
 </div>
@@ -163,8 +328,7 @@ text.length + " characters";
 
 function toggleDark(){
 
-document.getElementById("body")
-.classList.toggle("dark");
+document.body.classList.toggle("light");
 
 }
 
@@ -184,8 +348,14 @@ return;
 
 }
 
-document.getElementById("result").innerText =
-"AI is thinking...";
+document.getElementById("result").innerHTML = `
+<div class="loading">
+<div class="dot"></div>
+<div class="dot"></div>
+<div class="dot"></div>
+<span>DeepSeek is thinking...</span>
+</div>
+`;
 
 try{
 
@@ -208,8 +378,9 @@ mode
 const data =
 await response.json();
 
-document.getElementById("result").innerText =
-data.result || "Error";
+typeWriter(
+data.result || "No response"
+);
 
 }
 catch(error){
@@ -218,6 +389,33 @@ document.getElementById("result").innerText =
 "Error: " + error;
 
 }
+
+}
+
+function typeWriter(text){
+
+let i = 0;
+
+document.getElementById("result").innerHTML = "";
+
+const speed = 10;
+
+function typing(){
+
+if(i < text.length){
+
+document.getElementById("result").innerHTML +=
+text.charAt(i);
+
+i++;
+
+setTimeout(typing,speed);
+
+}
+
+}
+
+typing();
 
 }
 
