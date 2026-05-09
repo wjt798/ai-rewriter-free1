@@ -1,16 +1,18 @@
 export default async function handler(req, res) {
+
   if (req.method !== "POST") {
     return res.status(405).json({
-      error: "Method not allowed"
+      result: "Method not allowed"
     });
   }
 
   try {
+
     const { text } = req.body;
 
     if (!text) {
       return res.status(400).json({
-        error: "No text provided"
+        result: "No text provided"
       });
     }
 
@@ -26,13 +28,21 @@ export default async function handler(req, res) {
           model: "deepseek-chat",
           messages: [
             {
-              role: "system",
-              content:
-                "You are a professional AI rewriting assistant. Rewrite text naturally and clearly while preserving the original language and meaning. Only return the rewritten text."
-            },
-            {
               role: "user",
-              content: text
+              content:
+`You are a professional AI rewriting assistant.
+
+Rewrite the following text naturally, fluently, and clearly while preserving the original meaning and language.
+
+Rules:
+- Keep the same language
+- Improve clarity
+- Make it human-like
+- Do not explain anything
+- Only return the rewritten text
+
+Text:
+${text}`
             }
           ]
         })
@@ -41,15 +51,20 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    res.status(200).json({
-      result:
-        data.choices?.[0]?.message?.content ||
-        "No response"
+    const result =
+      data.choices?.[0]?.message?.content ||
+      "API Error";
+
+    return res.status(200).json({
+      result
     });
 
   } catch (error) {
-    res.status(500).json({
-      error: error.toString()
+
+    return res.status(500).json({
+      result: "Server Error"
     });
+
   }
+
 }
