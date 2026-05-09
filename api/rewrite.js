@@ -1,237 +1,214 @@
-export default async function handler(req, res) {
+export default async function handler(req,res){
 
-  if (req.method !== "POST") {
-    return res.status(405).json({
-      result: "Method not allowed"
-    });
-  }
+if(req.method !== "POST"){
 
-  try {
+return res.status(405).json({
+result:"Method not allowed"
+});
 
-    const { text, mode } = req.body;
+}
 
-    if (!text || text.trim() === "") {
+try{
 
-      return res.status(400).json({
-        result: "No text provided"
-      });
+const { text, mode } = req.body;
 
-    }
+if(!text){
 
-    let prompt = "";
+return res.status(400).json({
+result:"No text provided"
+});
 
-    // =========================
-    // Academic Mode
-    // =========================
+}
 
-    if (mode === "academic") {
+let prompt = "";
 
-      prompt = `
+if(mode === "academic"){
+
+prompt = `
 Rewrite this text in a professional academic style.
 
 Requirements:
-- Use formal academic language
-- Improve clarity and coherence
-- Improve sentence structure
-- Sound scholarly and intelligent
-- Keep original meaning
-- Use advanced vocabulary naturally
-`;
-
-    }
-
-    // =========================
-    // SEO Mode
-    // =========================
-
-    else if (mode === "seo") {
-
-      prompt = `
-Rewrite this text for SEO optimization.
-
-Requirements:
-- Improve readability
-- Make content engaging
-- Improve structure
-- Use powerful wording
-- Sound professional
-- Improve flow naturally
-- Make it more attractive for readers
-`;
-
-    }
-
-    // =========================
-    // Humanizer Mode
-    // =========================
-
-    else if (mode === "humanizer") {
-
-      prompt = `
-Rewrite this text to sound completely human.
-
-Requirements:
-- Use conversational tone
-- Avoid robotic wording
-- Sound natural and emotional
-- Add human rhythm
-- Improve engagement
-- Make it feel handwritten
-`;
-
-    }
-
-    // =========================
-    // Normal Mode
-    // =========================
-
-    else {
-
-      prompt = `
-Rewrite this text naturally and fluently.
-
-Requirements:
-- Improve readability
-- Improve wording
-- Keep original meaning
-- Sound natural
-`;
-
-    }
-
-    // =========================
-    // DeepSeek API Request
-    // =========================
-
-    const response = await fetch(
-      "https://api.deepseek.com/chat/completions",
-      {
-
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json",
-
-          "Authorization":
-          `Bearer ${process.env.DEEPSEEK_API_KEY}`
-        },
-
-        body: JSON.stringify({
-
-          model: "deepseek-chat",
-
-          temperature: 1.15,
-
-          max_tokens: 1200,
-
-          messages: [
-
-            // =========================
-            // System Prompt
-            // =========================
-
-            {
-              role: "system",
-
-              content: `
-You are an advanced AI rewriting assistant.
-
-Your goals:
-- Rewrite naturally
-- Sound fully human
+- Formal tone
+- Scholarly wording
 - Improve clarity
-- Improve readability
-- Improve flow
-- Avoid robotic AI wording
-- Preserve original meaning
-- Make writing more engaging
-
-You should write like a professional human writer.
-
-IMPORTANT:
-- Never mention AI
-- Never explain policies
-- Never say "Here is the rewritten version"
-- Do not sound robotic
-
-After rewriting also provide:
-
-1. Tone Analysis
-2. Improvements Made
-3. Alternative Version
-
-Output format EXACTLY:
-
-=== Rewritten Version ===
-(text)
-
-=== Tone Analysis ===
-(text)
-
-=== Improvements Made ===
-- item
-- item
-
-=== Alternative Version ===
-(text)
-`
-            },
-
-            // =========================
-            // User Prompt
-            // =========================
-
-            {
-              role: "user",
-
-              content: `
-${prompt}
+- Better structure
+- Human sounding
+- Keep original meaning
 
 Text:
 ${text}
+`;
+
+}
+
+else if(mode === "seo"){
+
+prompt = `
+Rewrite this text for SEO optimization.
+
+Requirements:
+- Engaging
+- Keyword rich
+- Human sounding
+- Improve readability
+- Professional marketing style
+- Strong hook
+- Better flow
+
+Text:
+${text}
+`;
+
+}
+
+else if(mode === "bypass"){
+
+prompt = `
+Rewrite this content to bypass AI detectors.
+
+Requirements:
+- Extremely human sounding
+- Natural imperfections
+- Vary sentence lengths
+- Conversational tone
+- Remove robotic patterns
+- Humanize heavily
+- Keep meaning
+
+Text:
+${text}
+`;
+
+}
+
+else if(mode === "translate"){
+
+prompt = `
+Translate this naturally into English.
+
+Text:
+${text}
+`;
+
+}
+
+else if(mode === "social"){
+
+prompt = `
+Turn this into a viral social media post.
+
+Requirements:
+- Hook
+- Emotional
+- Short paragraphs
+- Strong CTA
+- Human tone
+- Engaging
+
+Text:
+${text}
+`;
+
+}
+
+else if(mode === "title"){
+
+prompt = `
+Generate 10 catchy titles for this content.
+
+Text:
+${text}
+`;
+
+}
+
+else{
+
+prompt = `
+Rewrite this naturally and fluently.
+
+Requirements:
+- Human sounding
+- Improve quality
+- More engaging
+- Natural flow
+- Keep meaning
+- Avoid AI sounding
+
+Text:
+${text}
+`;
+
+}
+
+const response = await fetch(
+"https://api.deepseek.com/chat/completions",
+{
+method:"POST",
+
+headers:{
+"Content-Type":"application/json",
+"Authorization":
+`Bearer ${process.env.DEEPSEEK_API_KEY}`
+},
+
+body:JSON.stringify({
+
+model:"deepseek-chat",
+
+temperature:1.2,
+
+max_tokens:1200,
+
+messages:[
+
+{
+role:"system",
+content:`
+You are an advanced AI rewriting assistant.
+
+Goals:
+- Sound fully human
+- Avoid AI detection
+- Write naturally
+- Improve readability
+- Add richness and emotion
+- Use varied sentence structures
+- Avoid robotic wording
 `
-            }
+},
 
-          ]
+{
+role:"user",
+content:prompt
+}
 
-        })
+]
 
-      }
-    );
+})
 
-    // =========================
-    // Parse DeepSeek Response
-    // =========================
+}
 
-    const data = await response.json();
+);
 
-    const result =
-      data.choices?.[0]?.message?.content ||
-      "AI rewrite failed.";
+const data =
+await response.json();
 
-    // =========================
-    // Return Result
-    // =========================
+const result =
+data.choices?.[0]?.message?.content ||
+"AI rewrite failed";
 
-    return res.status(200).json({
-      result
-    });
+return res.status(200).json({
+result
+});
 
-  }
+}
+catch(error){
 
-  // =========================
-  // Error Handling
-  // =========================
+return res.status(500).json({
+result:error.message
+});
 
-  catch (error) {
-
-    return res.status(500).json({
-
-      result:
-      "Server error: " + error.message
-
-    });
-
-  }
+}
 
 }
