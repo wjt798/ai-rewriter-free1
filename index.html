@@ -183,44 +183,34 @@ async function rewriteText(){
     document.getElementById("result").innerText =
     "Rewriting...";
 
-    try{
+   try {
 
-        const response = await fetch("/api/rewrite", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    text: text
-  })
-});
+  const response = await fetch("/api/rewrite", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      text: text
+    })
+  });
 
-const data = await response.json();
+  const data = await response.json();
 
-document.getElementById("result").innerText =
-  data.result || "API Error";
+  document.getElementById("result").innerText =
+    data.result || "API Error";
 
-        const data = await response.json();
+  let usage = localStorage.getItem("usage") || 0;
+  usage++;
+  localStorage.setItem("usage", usage);
 
-        const result =
-        data.choices?.[0]?.message?.content ||
-        "API Error";
+} catch(error) {
 
-        document.getElementById("result").innerText =
-        result;
-
-        usage++;
-
-        localStorage.setItem("usage", usage);
-
-    }catch(error){
-
-        document.getElementById("result").innerText =
-        "Error: " + error;
-
-    }
+  document.getElementById("result").innerText =
+    "Error: " + error;
 
 }
+
 
 function copyResult(){
 
